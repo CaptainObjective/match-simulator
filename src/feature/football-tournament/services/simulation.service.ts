@@ -28,9 +28,13 @@ export class SimulationService {
   }
 
   stopSimulation(id: string) {
-    const simulation = this.simulations.find((simulation) => id === simulation.id);
+    const simulation = this.findSimulationById(id);
     if (simulation) {
       simulation.finish();
     }
+  }
+
+  findSimulationById(id: string) {
+    return this.simulations.find((simulation) => id === simulation.id);
   }
 }

@@ -20,7 +20,7 @@ export class Tournament {
 
   public get info() {
     const scores = this.matches.map((match) => match.score);
-    return { id: this.id, name: this.name, scores };
+    return { id: this.id, name: this.name, isFinished: this.isFinished, scores };
   }
 
   public get isFinished() {

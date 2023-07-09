@@ -7,6 +7,6 @@ export class FootballTournamentOutgoingEventsGateway {
   private server: Server;
 
   updateScoreForConnectedClients(tournament: Tournament) {
-    this.server.to(tournament.id).emit('score-update', tournament);
+    this.server.to(tournament.id).emit('score-update', tournament.info);
   }
 }

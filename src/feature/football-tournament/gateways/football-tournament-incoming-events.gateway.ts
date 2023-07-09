@@ -3,6 +3,7 @@ import { StartTournamentPayload } from '../models/start-tournament-payload.model
 import { Tournament } from '../models/tournament.model';
 import { SimulationService } from '../services/simulation.service';
 import { StopSimulationPayload } from '../models/stop-simulation-payload.model';
+import { SubscribeSimulationPayload } from '../models/subscribe-simulation-payload.model';
 
 @WebSocketGateway('football-tournament')
 export class FootballTournamentIncomingEventsGateway {
@@ -10,11 +11,24 @@ export class FootballTournamentIncomingEventsGateway {
 
   @SubscribeMessage('start')
   handleStart(@ConnectedSocket() socket: Socket, @MessageBody() { name }: StartTournamentPayload) {
-    const tournament = new Tournament(name);
-    this.simulationService.addTournament(tournament);
-    socket.join(tournament.id);
+    const simulation = new Tournament(name);
+    this.simulationService.addTournament(simulation);
+    socket.join(simulation.id);
 
-    return { tournamentId: tournament.id };
+    return { simulation: simulation.info };
+  }
+
+  @SubscribeMessage('subscribe')
+  handleSubscribe(@ConnectedSocket() socket: Socket, @MessageBody() { id }: SubscribeSimulationPayload) {
+    const simulation = this.simulationService.findSimulationById(id);
+
+    if (!simulation) {
+      return { error: 'Simulation does not exists' };
+    }
+
+    socket.join(simulation.id);
+
+    return { simulation: simulation.info };
   }
 
   @SubscribeMessage('stop')
