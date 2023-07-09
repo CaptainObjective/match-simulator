@@ -9,17 +9,22 @@ const defaultMatches = [
 
 export class Tournament {
   public readonly id = randomUUID();
-  private isStillInPlay = true;
+  private _isFinished = false;
   private minute = 0;
 
   constructor(private readonly name: string, private readonly matches = defaultMatches) {}
 
-  public get isFinished() {
-    return !this.isStillInPlay;
-  }
-
   public get isCurrentMinuteDivisibleByTen() {
     return this.minute % 10 === 0;
+  }
+
+  public get info() {
+    const scores = this.matches.map((match) => match.score);
+    return { id: this.id, name: this.name, scores };
+  }
+
+  public get isFinished() {
+    return this._isFinished;
   }
 
   scoreGoalForRandomTeamInRandomMatch() {
@@ -35,6 +40,10 @@ export class Tournament {
       this.scoreGoalForRandomTeamInRandomMatch();
     }
 
-    if (this.minute >= 90) this.isStillInPlay = false;
+    if (this.minute >= 90) this._isFinished = true;
+  }
+
+  finish() {
+    this._isFinished = true;
   }
 }
