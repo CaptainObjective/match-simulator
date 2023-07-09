@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { FootballTournamentGateway } from './football-tournament.gateway';
+import { FootballTournamentIncomingEventsGateway } from './gateways/football-tournament-incoming-events.gateway';
+import { SimulationService } from './services/simulation.service';
+import { FootballTournamentOutgoingEventsGateway } from './gateways/football-tournament-outgoing-events.gateway';
 
 @Module({
-  providers: [FootballTournamentGateway],
+  providers: [FootballTournamentIncomingEventsGateway, FootballTournamentOutgoingEventsGateway, SimulationService],
 })
 export class FootballTournamentModule {}
