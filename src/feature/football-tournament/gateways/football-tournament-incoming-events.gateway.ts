@@ -4,6 +4,7 @@ import { Tournament } from '../models/tournament.model';
 import { SimulationService } from '../services/simulation.service';
 import { StopSimulationPayload } from '../models/stop-simulation-payload.model';
 import { SubscribeSimulationPayload } from '../models/subscribe-simulation-payload.model';
+import { RestartSimulationPayload } from '../models/restart-simulation-payload.model';
 
 @WebSocketGateway('football-tournament')
 export class FootballTournamentIncomingEventsGateway {
@@ -34,5 +35,10 @@ export class FootballTournamentIncomingEventsGateway {
   @SubscribeMessage('stop')
   handleStop(@MessageBody() { id }: StopSimulationPayload) {
     this.simulationService.stopSimulation(id);
+  }
+
+  @SubscribeMessage('restart')
+  handleRestart(@MessageBody() { id }: RestartSimulationPayload) {
+    this.simulationService.restartSimulation(id);
   }
 }

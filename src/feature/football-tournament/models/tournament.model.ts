@@ -1,18 +1,16 @@
 import { randomUUID } from 'crypto';
 import { Match } from './match';
 
-const defaultMatches = [
-  new Match('Germany', 'Poland'),
-  new Match('Brazil', 'Mexico'),
-  new Match('Argentina', 'Uruguay'),
-];
-
 export class Tournament {
   public readonly id = randomUUID();
-  private _isFinished = false;
-  private minute = 0;
 
-  constructor(private readonly name: string, private readonly matches = defaultMatches) {}
+  private matches: Match[];
+  private minute = 0;
+  private _isFinished = false;
+
+  constructor(private readonly name: string) {
+    this.createMatches();
+  }
 
   public get isCurrentMinuteDivisibleByTen() {
     return this.minute % 10 === 0;
@@ -45,5 +43,15 @@ export class Tournament {
 
   finish() {
     this._isFinished = true;
+  }
+
+  restart() {
+    this._isFinished = false;
+    this.minute = 0;
+    this.createMatches();
+  }
+
+  private createMatches() {
+    this.matches = [new Match('Germany', 'Poland'), new Match('Brazil', 'Mexico'), new Match('Argentina', 'Uruguay')];
   }
 }
