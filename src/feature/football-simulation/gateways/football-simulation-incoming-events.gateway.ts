@@ -23,7 +23,7 @@ export class FootballSimulationIncomingEventsGateway {
     const simulation = this.simulationService.addSimulation(name);
     socket.join(simulation.id);
 
-    return { simulation: simulation.info };
+    return simulation.info;
   }
 
   @SubscribeMessage('subscribe')
@@ -34,15 +34,16 @@ export class FootballSimulationIncomingEventsGateway {
     const simulation = result.value;
     socket.join(simulation.id);
 
-    return { simulation: simulation.info };
+    return simulation.info;
   }
 
   @SubscribeMessage('stop')
   handleStop(@MessageBody() { id }: StopSimulationPayload) {
     const result = this.simulationService.stopSimulation(id);
     if (result.isErr()) throw new WsException(result.error);
+    const simulation = result.value;
 
-    return id;
+    return simulation.info;
   }
 
   @SubscribeMessage('restart')
@@ -50,8 +51,9 @@ export class FootballSimulationIncomingEventsGateway {
     const result = this.simulationService.restartSimulation(id);
     if (result.isErr()) throw new WsException(result.error);
 
-    socket.join(id);
+    const simulation = result.value;
+    socket.join(simulation.id);
 
-    return id;
+    return simulation.info;
   }
 }

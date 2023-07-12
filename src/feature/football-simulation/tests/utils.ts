@@ -2,7 +2,10 @@ import { app, client } from './setup';
 import { SimulationRunnerService } from '../services/simulation-runner.service';
 import { Simulation } from '../domain/simulation';
 
-type Scores = Simulation['info']['scores'];
+export type SimulationInfo = Simulation['info'];
+export type ErrorResponse = { message: string };
+
+type Scores = SimulationInfo['scores'];
 export const countTotalGoals = (scores: Scores) =>
   scores.reduce((total, match) => match.home.score + match.away.score + total, 0);
 

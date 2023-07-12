@@ -1,21 +1,16 @@
-import { advanceTimer, countTotalGoals, waitForEvent } from '../utils';
+import { ErrorResponse, SimulationInfo, advanceTimer, countTotalGoals, waitForEvent } from '../utils';
 import { client } from '../setup';
-import { Simulation } from '../../domain/simulation';
-
-type SuccessResponse = { simulation: Simulation['info'] };
 
 describe('restart simulation event', () => {
   describe('when id of stopped simulation is passed, should mark simulation as running and reset goal count', () => {
     it('should mark simulation as not finished', async () => {
-      const {
-        simulation: { id },
-      }: SuccessResponse = await client.emitWithAck('start', { name: 'Katar 2023' });
+      const { id }: SimulationInfo = await client.emitWithAck('start', { name: 'Katar 2023' });
       await client.emitWithAck('stop', { id });
 
       await client.emitWithAck('restart', { id });
 
       advanceTimer(10);
-      const simulation = await waitForEvent<Simulation['info']>('score-update');
+      const simulation = await waitForEvent<SimulationInfo>('score-update');
       const totalGoals = countTotalGoals(simulation.scores);
       expect(simulation.name).toBe('Katar 2023');
       expect(simulation.isFinished).toBe(false);
@@ -43,11 +38,9 @@ describe('restart simulation event', () => {
     });
 
     it('when simulation with given id is already running, should return error', async () => {
-      const {
-        simulation: { id },
-      }: SuccessResponse = await client.emitWithAck('start', { name: 'Katar 2023' });
+      const { id }: SimulationInfo = await client.emitWithAck('start', { name: 'Katar 2023' });
 
-      const { message } = await client.emitWithAck('restart', { id });
+      const { message }: ErrorResponse = await client.emitWithAck('restart', { id });
 
       expect(message).toBe('Simulation is still running');
     });
