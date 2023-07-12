@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { Match } from './match';
 
-export class Tournament {
+export class Simulation {
   public readonly id = randomUUID();
 
   private matches: Match[];

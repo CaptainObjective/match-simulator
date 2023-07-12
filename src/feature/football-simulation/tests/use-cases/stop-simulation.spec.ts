@@ -1,13 +1,13 @@
-import { Tournament } from '../../models/tournament.model';
 import { advanceTimer, countTotalGoals, waitForEvent } from '../utils';
 import { client } from '../setup';
+import { Simulation } from '../../domain/simulation';
 
 describe('stop simulation event', () => {
   describe('when id is valid', () => {
     it('should mark simulation as finished and stop scoring goals', async () => {
       await client.emitWithAck('start', { name: 'Katar 2023' });
       advanceTimer(10);
-      const simulationBeforeStop = await waitForEvent<Tournament['info']>('score-update');
+      const simulationBeforeStop = await waitForEvent<Simulation['info']>('score-update');
 
       await client.emitWithAck('stop', { id: simulationBeforeStop.id });
       advanceTimer(20);

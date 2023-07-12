@@ -12,7 +12,7 @@ beforeEach(async () => {
   await app.init();
 
   const { port } = app.getHttpServer().listen().address();
-  client = io(`ws://localhost:${port}/football-tournament`);
+  client = io(`ws://localhost:${port}/football-simulation`);
 });
 
 afterEach(() => {

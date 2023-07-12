@@ -1,8 +1,8 @@
-import { Tournament } from '../../models/tournament.model';
 import { advanceTimer, countTotalGoals, waitForEvent } from '../utils';
 import { client } from '../setup';
+import { Simulation } from '../../domain/simulation';
 
-type SuccessResponse = { simulation: Tournament['info'] };
+type SuccessResponse = { simulation: Simulation['info'] };
 
 describe('restart simulation event', () => {
   describe('when id of stopped simulation is passed, should mark simulation as running and reset goal count', () => {
@@ -15,7 +15,7 @@ describe('restart simulation event', () => {
       await client.emitWithAck('restart', { id });
 
       advanceTimer(10);
-      const simulation = await waitForEvent<Tournament['info']>('score-update');
+      const simulation = await waitForEvent<Simulation['info']>('score-update');
       const totalGoals = countTotalGoals(simulation.scores);
       expect(simulation.name).toBe('Katar 2023');
       expect(simulation.isFinished).toBe(false);

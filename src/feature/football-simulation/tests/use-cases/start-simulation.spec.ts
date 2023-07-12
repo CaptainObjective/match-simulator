@@ -1,8 +1,8 @@
-import { Tournament } from '../../models/tournament.model';
+import { Simulation } from '../../domain/simulation';
 import { client } from '../setup';
 import { advanceTimer, countTotalGoals, waitForEvent, waitForEventMeetingCondition } from '../utils';
 
-type SuccessResponse = { simulation: Tournament['info'] };
+type SuccessResponse = { simulation: Simulation['info'] };
 type ErrorResponse = { message: string };
 
 describe('start simulation event', () => {
@@ -20,7 +20,7 @@ describe('start simulation event', () => {
       await client.emitWithAck('start', { name: 'Katar 2023' });
       advanceTimer(10);
 
-      const simulation = await waitForEvent<Tournament['info']>('score-update');
+      const simulation = await waitForEvent<Simulation['info']>('score-update');
 
       const totalGoals = countTotalGoals(simulation.scores);
       expect(simulation.name).toBe('Katar 2023');
@@ -31,16 +31,16 @@ describe('start simulation event', () => {
     it('should score 9 goals and end after 90 seconds', async () => {
       await client.emitWithAck('start', { name: 'Katar 2023' });
       advanceTimer(90);
-      const isEventFinished = (simulation: Tournament['info']) => simulation.isFinished;
+      const isEventFinished = (simulation: Simulation['info']) => simulation.isFinished;
 
-      const simulation = await waitForEventMeetingCondition<Tournament['info']>('score-update', isEventFinished);
+      const simulation = await waitForEventMeetingCondition<Simulation['info']>('score-update', isEventFinished);
 
       const totalGoals = countTotalGoals(simulation.scores);
       expect(simulation.name).toBe('Katar 2023');
       expect(totalGoals).toBe(9);
     });
 
-    it('when trying to start tournament within 5 five minutes of starting another, should return simulation', async () => {
+    it('when trying to start simulation within 5 five minutes of starting another, should return error', async () => {
       await client.emitWithAck('start', { name: 'Katar 2023' });
       const { message }: ErrorResponse = await client.emitWithAck('start', { name: 'Katar 2024' });
 
@@ -50,7 +50,7 @@ describe('start simulation event', () => {
 
   describe('when name is invalid', () => {
     const expectedErrorMessage =
-      'Invalid tournament name. It should have a minimum of 8 characters, a maximum of 30 characters, and only contain digits, whitespaces, or alphabetic characters.';
+      'Invalid simulation name. It should have a minimum of 8 characters, a maximum of 30 characters, and only contain digits, whitespaces, or alphabetic characters.';
 
     it('when name is too short, should return error', async () => {
       const { message }: ErrorResponse = await client.emitWithAck('start', { name: 'Short' });

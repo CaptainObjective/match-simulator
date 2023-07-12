@@ -5,8 +5,8 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 
-@ValidatorConstraint({ name: 'tournamentName', async: false })
-class TournamentNameConstraint implements ValidatorConstraintInterface {
+@ValidatorConstraint({ name: 'simulationName', async: false })
+class SimulationNameConstraint implements ValidatorConstraintInterface {
   validate(value: string) {
     const nameIsOfValidLength = value.length >= 8 && value.length <= 30;
     if (!nameIsOfValidLength) return false;
@@ -19,18 +19,18 @@ class TournamentNameConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage(): string {
-    return 'Invalid tournament name. It should have a minimum of 8 characters, a maximum of 30 characters, and only contain digits, whitespaces, or alphabetic characters.';
+    return 'Invalid simulation name. It should have a minimum of 8 characters, a maximum of 30 characters, and only contain digits, whitespaces, or alphabetic characters.';
   }
 }
 
-export function IsTournamentName(validationOptions?: ValidationOptions) {
+export function IsSimulationName(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string): void {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: TournamentNameConstraint,
+      validator: SimulationNameConstraint,
     });
   };
 }

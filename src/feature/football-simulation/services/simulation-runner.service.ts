@@ -1,32 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
-import { Tournament } from '../models/tournament.model';
-import { FootballTournamentOutgoingEventsGateway } from '../gateways/football-tournament-outgoing-events.gateway';
 import { err, ok } from 'neverthrow';
+
+import { FootballSimulationOutgoingEventsGateway } from '../gateways/football-simulation-outgoing-events.gateway';
+import { Simulation } from '../domain/simulation';
 
 const oneSecond = 1000;
 
 @Injectable()
-export class SimulationService {
-  private simulations: Tournament[] = [];
+export class SimulationRunnerService {
+  private simulations: Simulation[] = [];
 
-  constructor(private readonly outgoingEventsGateway: FootballTournamentOutgoingEventsGateway) {}
+  constructor(private readonly outgoingEventsGateway: FootballSimulationOutgoingEventsGateway) {}
 
   @Interval(oneSecond)
-  updateTournaments() {
-    this.simulations.forEach((tournament) => {
-      if (tournament.isFinished) return;
+  updateSimulations() {
+    this.simulations.forEach((simulation) => {
+      if (simulation.isFinished) return;
 
-      tournament.update();
+      simulation.update();
 
-      if (tournament.isCurrentMinuteDivisibleByTen) {
-        this.outgoingEventsGateway.updateScoreForConnectedClients(tournament);
+      if (simulation.isCurrentMinuteDivisibleByTen) {
+        this.outgoingEventsGateway.updateScoreForConnectedClients(simulation);
       }
     });
   }
 
-  addTournament(name: string) {
-    const simulation = new Tournament(name);
+  addSimulation(name: string) {
+    const simulation = new Simulation(name);
     this.simulations.push(simulation);
 
     return simulation;

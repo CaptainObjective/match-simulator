@@ -6,21 +6,21 @@ import {
   WebSocketGateway,
   WsException,
 } from 'src/shared/websockets';
-import { StartTournamentPayload } from '../models/start-tournament-payload.model';
-import { SimulationService } from '../services/simulation.service';
+import { StartSimulationPayload } from '../models/start-simulation-payload.model';
+import { SimulationRunnerService } from '../services/simulation-runner.service';
 import { StopSimulationPayload } from '../models/stop-simulation-payload.model';
 import { SubscribeSimulationPayload } from '../models/subscribe-simulation-payload.model';
 import { RestartSimulationPayload } from '../models/restart-simulation-payload.model';
 import { RateLimit } from '../interceptors/rate-limit.interceptor';
 
-@WebSocketGateway('football-tournament')
-export class FootballTournamentIncomingEventsGateway {
-  constructor(private readonly simulationService: SimulationService) {}
+@WebSocketGateway('football-simulation')
+export class FootballSimulationIncomingEventsGateway {
+  constructor(private readonly simulationService: SimulationRunnerService) {}
 
   @RateLimit()
   @SubscribeMessage('start')
-  handleStart(@ConnectedSocket() socket: Socket, @MessageBody() { name }: StartTournamentPayload) {
-    const simulation = this.simulationService.addTournament(name);
+  handleStart(@ConnectedSocket() socket: Socket, @MessageBody() { name }: StartSimulationPayload) {
+    const simulation = this.simulationService.addSimulation(name);
     socket.join(simulation.id);
 
     return { simulation: simulation.info };

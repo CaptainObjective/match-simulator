@@ -13,7 +13,7 @@ const config: Config = {
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/$1',
   },
-  setupFilesAfterEnv: ['./feature/football-tournament/tests/setup.ts'],
+  setupFilesAfterEnv: ['./feature/football-simulation/tests/setup.ts'],
 };
 
 export default config;
