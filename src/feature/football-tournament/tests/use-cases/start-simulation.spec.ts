@@ -39,6 +39,13 @@ describe('start simulation event', () => {
       expect(simulation.name).toBe('Katar 2023');
       expect(totalGoals).toBe(9);
     });
+
+    it('when trying to start tournament within 5 five minutes of starting another, should return simulation', async () => {
+      await client.emitWithAck('start', { name: 'Katar 2023' });
+      const { message }: ErrorResponse = await client.emitWithAck('start', { name: 'Katar 2024' });
+
+      expect(message).toBe('Rate limit reached. Please try again later');
+    });
   });
 
   describe('when name is invalid', () => {
