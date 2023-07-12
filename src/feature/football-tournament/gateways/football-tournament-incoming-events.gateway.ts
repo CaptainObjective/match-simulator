@@ -54,5 +54,6 @@ export class FootballTournamentIncomingEventsGateway {
     }
 
     this.simulationService.restartSimulation(id);
+    return id;
   }
 }

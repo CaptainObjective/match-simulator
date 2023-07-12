@@ -37,6 +37,7 @@ export class SimulationService {
 
   restartSimulation(id: string) {
     const simulation = this.findSimulationById(id);
+
     if (simulation && simulation.isFinished) {
       simulation.restart();
     }
