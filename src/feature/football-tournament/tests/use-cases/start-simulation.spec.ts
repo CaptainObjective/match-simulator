@@ -1,33 +1,43 @@
-import { INestApplication } from '@nestjs/common';
-import { Socket } from 'socket.io-client';
-import { Tournament } from '../models/tournament.model';
-import { countTotalGoals, createApp, createSocketClient } from './utils';
+import { Tournament } from '../../models/tournament.model';
+import { client } from '../setup';
+import { advanceTimer, countTotalGoals, waitForEvent, waitForEventMeetingCondition } from '../utils';
 
 type SuccessResponse = { simulation: Tournament['info'] };
 type ErrorResponse = { message: string };
 
 describe('start simulation event', () => {
-  let app: INestApplication;
-  let client: Socket;
-
-  beforeAll(async () => {
-    app = await createApp();
-    client = createSocketClient();
-  });
-
-  afterAll(() => {
-    client.close();
-    app.close();
-  });
-
   describe('when name is valid', () => {
     it('should return simulation', async () => {
       const { simulation }: SuccessResponse = await client.emitWithAck('start', { name: 'Katar 2023' });
-      const totalGoals = countTotalGoals(simulation.scores);
 
+      const totalGoals = countTotalGoals(simulation.scores);
       expect(simulation.name).toBe('Katar 2023');
       expect(simulation.isFinished).toBe(false);
       expect(totalGoals).toBe(0);
+    });
+
+    it('should score exactly 1 goal after 10 seconds', async () => {
+      await client.emitWithAck('start', { name: 'Katar 2023' });
+      advanceTimer(10);
+
+      const simulation = await waitForEvent<Tournament['info']>('score-update');
+
+      const totalGoals = countTotalGoals(simulation.scores);
+      expect(simulation.name).toBe('Katar 2023');
+      expect(simulation.isFinished).toBe(false);
+      expect(totalGoals).toBe(1);
+    });
+
+    it('should score 9 goals and end after 90 seconds', async () => {
+      await client.emitWithAck('start', { name: 'Katar 2023' });
+      advanceTimer(90);
+      const isEventFinished = (simulation: Tournament['info']) => simulation.isFinished;
+
+      const simulation = await waitForEventMeetingCondition<Tournament['info']>('score-update', isEventFinished);
+
+      const totalGoals = countTotalGoals(simulation.scores);
+      expect(simulation.name).toBe('Katar 2023');
+      expect(totalGoals).toBe(9);
     });
   });
 

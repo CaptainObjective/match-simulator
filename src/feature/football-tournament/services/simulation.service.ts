@@ -17,6 +17,7 @@ export class SimulationService {
       if (tournament.isFinished) return;
 
       tournament.update();
+
       if (tournament.isCurrentMinuteDivisibleByTen) {
         this.outgoingEventsGateway.updateScoreForConnectedClients(tournament);
       }

@@ -24,7 +24,7 @@ export class FootballTournamentIncomingEventsGateway {
     const simulation = this.simulationService.findSimulationById(id);
 
     if (!simulation) {
-      return { error: 'Simulation does not exists' };
+      return { message: 'Simulation does not exists' };
     }
 
     socket.join(simulation.id);
@@ -34,11 +34,25 @@ export class FootballTournamentIncomingEventsGateway {
 
   @SubscribeMessage('stop')
   handleStop(@MessageBody() { id }: StopSimulationPayload) {
+    const simulation = this.simulationService.findSimulationById(id);
+
+    if (!simulation) {
+      return { message: 'Simulation with given id does not exist' };
+    }
+
     this.simulationService.stopSimulation(id);
+
+    return id;
   }
 
   @SubscribeMessage('restart')
   handleRestart(@MessageBody() { id }: RestartSimulationPayload) {
+    const simulation = this.simulationService.findSimulationById(id);
+
+    if (!simulation) {
+      return { message: 'Simulation does not exists' };
+    }
+
     this.simulationService.restartSimulation(id);
   }
 }
