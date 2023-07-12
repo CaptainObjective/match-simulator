@@ -25,8 +25,11 @@ export class SimulationService {
     });
   }
 
-  addTournament(tournament: Tournament) {
-    this.simulations.push(tournament);
+  addTournament(name: string) {
+    const simulation = new Tournament(name);
+    this.simulations.push(simulation);
+
+    return simulation;
   }
 
   stopSimulation(id: string) {

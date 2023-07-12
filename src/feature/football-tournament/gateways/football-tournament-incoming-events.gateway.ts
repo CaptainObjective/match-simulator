@@ -7,20 +7,20 @@ import {
   WsException,
 } from 'src/shared/websockets';
 import { StartTournamentPayload } from '../models/start-tournament-payload.model';
-import { Tournament } from '../models/tournament.model';
 import { SimulationService } from '../services/simulation.service';
 import { StopSimulationPayload } from '../models/stop-simulation-payload.model';
 import { SubscribeSimulationPayload } from '../models/subscribe-simulation-payload.model';
 import { RestartSimulationPayload } from '../models/restart-simulation-payload.model';
+import { RateLimit } from '../interceptors/rate-limit.interceptor';
 
 @WebSocketGateway('football-tournament')
 export class FootballTournamentIncomingEventsGateway {
   constructor(private readonly simulationService: SimulationService) {}
 
+  @RateLimit()
   @SubscribeMessage('start')
   handleStart(@ConnectedSocket() socket: Socket, @MessageBody() { name }: StartTournamentPayload) {
-    const simulation = new Tournament(name);
-    this.simulationService.addTournament(simulation);
+    const simulation = this.simulationService.addTournament(name);
     socket.join(simulation.id);
 
     return { simulation: simulation.info };
@@ -46,9 +46,11 @@ export class FootballTournamentIncomingEventsGateway {
   }
 
   @SubscribeMessage('restart')
-  handleRestart(@MessageBody() { id }: RestartSimulationPayload) {
+  handleRestart(@ConnectedSocket() socket: Socket, @MessageBody() { id }: RestartSimulationPayload) {
     const result = this.simulationService.restartSimulation(id);
     if (result.isErr()) throw new WsException(result.error);
+
+    socket.join(id);
 
     return id;
   }
