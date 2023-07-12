@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { Tournament } from '../models/tournament.model';
 import { FootballTournamentOutgoingEventsGateway } from '../gateways/football-tournament-outgoing-events.gateway';
+import { err, ok } from 'neverthrow';
 
 const oneSecond = 1000;
 
@@ -29,21 +30,29 @@ export class SimulationService {
   }
 
   stopSimulation(id: string) {
-    const simulation = this.findSimulationById(id);
-    if (simulation) {
-      simulation.finish();
-    }
+    const result = this.findSimulationById(id);
+    if (result.isErr()) return result;
+
+    const simulation = result.value;
+    if (!simulation) return err('Simulation with given id does not exist');
+
+    simulation.finish();
+    return ok(simulation);
   }
 
   restartSimulation(id: string) {
-    const simulation = this.findSimulationById(id);
+    const result = this.findSimulationById(id);
+    if (result.isErr()) return result;
 
-    if (simulation && simulation.isFinished) {
-      simulation.restart();
-    }
+    const simulation = result.value;
+    if (!simulation.isFinished) return err('Simulation is still running');
+
+    simulation.restart();
+    return ok(simulation);
   }
 
   findSimulationById(id: string) {
-    return this.simulations.find((simulation) => id === simulation.id);
+    const simulation = this.simulations.find((simulation) => id === simulation.id);
+    return simulation ? ok(simulation) : err('Simulation with given id does not exist');
   }
 }

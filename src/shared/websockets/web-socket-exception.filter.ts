@@ -14,11 +14,13 @@ export class WebSocketExceptionFilter extends BaseWsExceptionFilter {
   }
 
   private createMessage(exception: any) {
-    const validationErrorMessage = exception?.getResponse()?.message?.[0];
+    const validationErrorMessage = exception?.getResponse?.()?.message?.[0];
     if (validationErrorMessage) return validationErrorMessage;
 
-    const commonErrorMessage = exception?.getResponse();
-    if (commonErrorMessage) return commonErrorMessage;
+    const httpResponseErrorMessage = exception?.getResponse?.();
+    if (httpResponseErrorMessage) return httpResponseErrorMessage;
+
+    if (exception?.message) return exception.message;
 
     return 'Unknown Exception';
   }

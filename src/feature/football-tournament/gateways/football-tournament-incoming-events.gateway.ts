@@ -1,4 +1,11 @@
-import { ConnectedSocket, MessageBody, Socket, SubscribeMessage, WebSocketGateway } from 'src/shared/websockets';
+import {
+  ConnectedSocket,
+  MessageBody,
+  Socket,
+  SubscribeMessage,
+  WebSocketGateway,
+  WsException,
+} from 'src/shared/websockets';
 import { StartTournamentPayload } from '../models/start-tournament-payload.model';
 import { Tournament } from '../models/tournament.model';
 import { SimulationService } from '../services/simulation.service';
@@ -21,12 +28,10 @@ export class FootballTournamentIncomingEventsGateway {
 
   @SubscribeMessage('subscribe')
   handleSubscribe(@ConnectedSocket() socket: Socket, @MessageBody() { id }: SubscribeSimulationPayload) {
-    const simulation = this.simulationService.findSimulationById(id);
+    const result = this.simulationService.findSimulationById(id);
+    if (result.isErr()) throw new WsException(result.error);
 
-    if (!simulation) {
-      return { message: 'Simulation does not exists' };
-    }
-
+    const simulation = result.value;
     socket.join(simulation.id);
 
     return { simulation: simulation.info };
@@ -34,26 +39,17 @@ export class FootballTournamentIncomingEventsGateway {
 
   @SubscribeMessage('stop')
   handleStop(@MessageBody() { id }: StopSimulationPayload) {
-    const simulation = this.simulationService.findSimulationById(id);
-
-    if (!simulation) {
-      return { message: 'Simulation with given id does not exist' };
-    }
-
-    this.simulationService.stopSimulation(id);
+    const result = this.simulationService.stopSimulation(id);
+    if (result.isErr()) throw new WsException(result.error);
 
     return id;
   }
 
   @SubscribeMessage('restart')
   handleRestart(@MessageBody() { id }: RestartSimulationPayload) {
-    const simulation = this.simulationService.findSimulationById(id);
+    const result = this.simulationService.restartSimulation(id);
+    if (result.isErr()) throw new WsException(result.error);
 
-    if (!simulation) {
-      return { message: 'Simulation does not exists' };
-    }
-
-    this.simulationService.restartSimulation(id);
     return id;
   }
 }

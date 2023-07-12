@@ -42,14 +42,14 @@ describe('restart simulation event', () => {
       expect(message).toBe('Simulation with given id does not exist');
     });
 
-    xit('when simulation with given id is already running, should return error', async () => {
+    it('when simulation with given id is already running, should return error', async () => {
       const {
         simulation: { id },
       }: SuccessResponse = await client.emitWithAck('start', { name: 'Katar 2023' });
 
       const { message } = await client.emitWithAck('restart', { id });
 
-      expect(message).toBe('Simulation with given id does not exist');
+      expect(message).toBe('Simulation is still running');
     });
   });
 });
