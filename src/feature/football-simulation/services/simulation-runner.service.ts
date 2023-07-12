@@ -38,9 +38,8 @@ export class SimulationRunnerService {
     if (result.isErr()) return result;
 
     const simulation = result.value;
-    if (!simulation) return err('Simulation with given id does not exist');
-
     simulation.finish();
+
     return ok(simulation);
   }
 

@@ -25,7 +25,7 @@ describe('restart simulation event', () => {
 
   describe('when id is invalid', () => {
     it('when id is not valid uuid, should return error', async () => {
-      const { message } = await client.emitWithAck('stop', {
+      const { message } = await client.emitWithAck('restart', {
         id: 'invalid UUID id',
       });
 
@@ -35,7 +35,7 @@ describe('restart simulation event', () => {
     it('when there is no simulation with given id, should return error', async () => {
       const nonexistentUuid = 'b94715e8-bd34-41a1-a8e3-d802e431e973';
 
-      const { message } = await client.emitWithAck('stop', {
+      const { message } = await client.emitWithAck('restart', {
         id: nonexistentUuid,
       });
 

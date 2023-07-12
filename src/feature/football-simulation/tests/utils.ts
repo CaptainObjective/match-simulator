@@ -13,9 +13,9 @@ export const advanceTimer = (secondsToSkip: number) => {
   }
 };
 
-export const waitForEvent = <T = unknown>(event: string) =>
+export const waitForEvent = <T = unknown>(event: string, socketClient = client) =>
   new Promise<T>((resolve) => {
-    client.on(event, resolve);
+    socketClient.on(event, resolve);
   });
 
 export const waitForEventMeetingCondition = <T = unknown>(event: string, condition: (payload: T) => boolean) =>

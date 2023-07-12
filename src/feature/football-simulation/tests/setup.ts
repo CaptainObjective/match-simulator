@@ -12,7 +12,8 @@ beforeEach(async () => {
   await app.init();
 
   const { port } = app.getHttpServer().listen().address();
-  client = io(`ws://localhost:${port}/football-simulation`);
+  appPort = port;
+  client = io(`ws://localhost:${appPort}/football-simulation`);
 });
 
 afterEach(() => {
@@ -20,5 +21,6 @@ afterEach(() => {
   app.close();
 });
 
+export let appPort: number;
 export let app: INestApplication;
 export let client: Socket;

@@ -17,9 +17,6 @@ export class WebSocketExceptionFilter extends BaseWsExceptionFilter {
     const validationErrorMessage = exception?.getResponse?.()?.message?.[0];
     if (validationErrorMessage) return validationErrorMessage;
 
-    const httpResponseErrorMessage = exception?.getResponse?.();
-    if (httpResponseErrorMessage) return httpResponseErrorMessage;
-
     if (exception?.message) return exception.message;
 
     return 'Unknown Exception';
